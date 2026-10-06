@@ -1,6 +1,6 @@
 <template>
     <div class="outer-container" onkeydown={handleKeydown}>
-        <lightning-card title="Image Viewer" icon-name="standard:image">
+        <lightning-card title="Image Viewer" icon-name="utility:image">
             <div slot="actions">
                 <template lwc:if={showAddButton}>
                     <lightning-button
@@ -18,6 +18,13 @@
                         onclick={handleDelete}>
                     </lightning-button>
                 </template>
+                <lightning-button-icon
+                    icon-name="utility:refresh"
+                    alternative-text="更新"
+                    title="更新"
+                    disabled={isRefreshing}
+                    onclick={handleRefresh}>
+                </lightning-button-icon>
             </div>
 
             <div class="card-body">

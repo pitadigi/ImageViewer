@@ -1,8 +1,8 @@
 import { LightningElement, api, wire } from 'lwc';
 import { refreshApex } from '@salesforce/apex';
+import { deleteRecord } from 'lightning/uiRecordApi';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 import getImageFiles from '@salesforce/apex/ImageViewerController.getImageFiles';
-import deleteFile from '@salesforce/apex/ImageViewerController.deleteFile';
 
 export default class ImageViewer extends LightningElement {
     @api recordId;
@@ -18,10 +18,13 @@ export default class ImageViewer extends LightningElement {
     isLoading = true;
     showUpload = false;
     showDeleteConfirm = false;
+    isRefreshing = false;
 
     @wire(getImageFiles, { recordId: '$recordId' })
     wiredFiles(result) {
         this._wiredResult = result;
+        this.isLoading = false;
+        this.isRefreshing = false;
         const { error, data } = result;
         if (data) {
             this.files = data.map(f => ({
@@ -39,7 +42,13 @@ export default class ImageViewer extends LightningElement {
             this.error = error;
             this.files = [];
         }
-        this.isLoading = false;
+    }
+
+    _doRefresh() {
+        this.files = [];
+        this.isLoading = true;
+        this.isRefreshing = true;
+        refreshApex(this._wiredResult);
     }
 
     get computedFiles() {
@@ -87,6 +96,12 @@ export default class ImageViewer extends LightningElement {
         return file ? `「${file.title}」を削除しますか？` : '';
     }
 
+    handleRefresh() {
+        this.lightboxFile = null;
+        this.selectedFileId = null;
+        this._doRefresh();
+    }
+
     handleAdd() {
         this.showUpload = !this.showUpload;
     }
@@ -97,7 +112,7 @@ export default class ImageViewer extends LightningElement {
 
     handleUploadFinished() {
         this.showUpload = false;
-        refreshApex(this._wiredResult);
+        this._doRefresh();
     }
 
     handleDelete() {
@@ -119,13 +134,11 @@ export default class ImageViewer extends LightningElement {
         const file = this.files.find(f => f.id === this.selectedFileId);
         if (!file) return;
         try {
-            await deleteFile({ contentDocumentId: file.contentDocumentId });
-            if (this.lightboxFile?.id === this.selectedFileId) {
-                this.lightboxFile = null;
-            }
+            await deleteRecord(file.contentDocumentId);
+            this.lightboxFile = null;
             this.selectedFileId = null;
             this.showDeleteConfirm = false;
-            await refreshApex(this._wiredResult);
+            this._doRefresh();
         } catch (err) {
             this.showDeleteConfirm = false;
             this.dispatchEvent(new ShowToastEvent({
