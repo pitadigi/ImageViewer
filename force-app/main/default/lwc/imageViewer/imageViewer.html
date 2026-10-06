@@ -1,0 +1,117 @@
+<template>
+    <div class="outer-container" onkeydown={handleKeydown}>
+        <lightning-card title="Image Viewer" icon-name="standard:image">
+            <div slot="actions">
+                <template lwc:if={showAddButton}>
+                    <lightning-button
+                        label="追加"
+                        icon-name="utility:add"
+                        onclick={handleAdd}>
+                    </lightning-button>
+                </template>
+                <template lwc:if={showDeleteButton}>
+                    <lightning-button
+                        label="削除"
+                        icon-name="utility:delete"
+                        variant="destructive-text"
+                        disabled={noSelection}
+                        onclick={handleDelete}>
+                    </lightning-button>
+                </template>
+            </div>
+
+            <div class="card-body">
+                <!-- Upload section -->
+                <template lwc:if={showUpload}>
+                    <div class="upload-section">
+                        <lightning-file-upload
+                            label="画像ファイルをアップロード（jpg / png / gif）"
+                            name="imageUpload"
+                            accept={acceptedFormats}
+                            record-id={recordId}
+                            onuploadfinished={handleUploadFinished}
+                            multiple>
+                        </lightning-file-upload>
+                        <div class="upload-close">
+                            <lightning-button label="閉じる" onclick={handleCloseUpload}></lightning-button>
+                        </div>
+                    </div>
+                </template>
+
+                <!-- Tile grid -->
+                <div class="wrapper" style={containerStyle}>
+                    <template lwc:if={isLoading}>
+                        <div class="status-container">
+                            <lightning-spinner alternative-text="読み込み中" size="medium"></lightning-spinner>
+                        </div>
+                    </template>
+                    <template lwc:elseif={hasError}>
+                        <div class="status-container">
+                            <p class="status-message">ファイルを読み込めませんでした</p>
+                        </div>
+                    </template>
+                    <template lwc:elseif={hasFiles}>
+                        <div class="tile-container">
+                            <template for:each={computedFiles} for:item="file">
+                                <div key={file.id}
+                                     class={file.tileClass}
+                                     data-id={file.id}
+                                     onclick={handleTileClick}
+                                     onkeydown={handleTileKeydown}
+                                     role="button"
+                                     tabindex="0"
+                                     aria-label={file.title}>
+                                    <div class="preview-area">
+                                        <img class="preview-img" src={file.previewUrl} alt="" />
+                                    </div>
+                                    <div class="filename-area">
+                                        <span class="filename-text" title={file.title}>{file.title}</span>
+                                    </div>
+                                </div>
+                            </template>
+                        </div>
+                    </template>
+                    <template lwc:else>
+                        <div class="status-container">
+                            <p class="status-message">画像ファイルがありません</p>
+                        </div>
+                    </template>
+
+                    <!-- Lightbox -->
+                    <template lwc:if={lightboxFile}>
+                        <div class="lightbox"
+                             onclick={handleLightboxClose}
+                             role="dialog"
+                             aria-label="画像の拡大表示"
+                             aria-modal="true"
+                             tabindex="-1">
+                            <img class="lightbox-img"
+                                 src={lightboxFile.fullUrl}
+                                 alt={lightboxFile.title} />
+                            <p class="lightbox-filename">{lightboxFile.title}</p>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </lightning-card>
+
+        <!-- Delete confirmation dialog -->
+        <template lwc:if={showDeleteConfirm}>
+            <div class="confirm-backdrop"
+                 onclick={handleBackdropClick}
+                 role="presentation">
+                <div class="confirm-dialog"
+                     role="alertdialog"
+                     aria-modal="true"
+                     aria-labelledby="confirm-heading">
+                    <h2 id="confirm-heading" class="confirm-title">削除の確認</h2>
+                    <p class="confirm-message">{deleteConfirmMessage}</p>
+                    <div class="confirm-buttons">
+                        <lightning-button label="キャンセル" onclick={handleCancelDelete}></lightning-button>
+                        <lightning-button label="削除" variant="destructive" onclick={handleConfirmDelete}></lightning-button>
+                    </div>
+                </div>
+            </div>
+        </template>
+    </div>
+</template>

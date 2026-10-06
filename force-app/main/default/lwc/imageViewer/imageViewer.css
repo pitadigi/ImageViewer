@@ -1,0 +1,189 @@
+:host {
+    display: block;
+    width: 100%;
+}
+
+.outer-container {
+    position: relative;
+}
+
+.card-body {
+    padding: 0 12px 12px;
+}
+
+.wrapper {
+    position: relative;
+    width: 100%;
+    min-height: 4rem;
+}
+
+/* Tile grid */
+.tile-container {
+    display: grid;
+    grid-template-columns: repeat(var(--columns, 4), 1fr);
+    gap: 4px;
+}
+
+.tile {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    cursor: pointer;
+    border-radius: 4px;
+    background-color: #f3f3f3;
+    border: 2px solid #e0e0e0;
+    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.tile:hover {
+    transform: scale(1.02);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 1;
+}
+
+.tile:focus {
+    outline: 2px solid #0176d3;
+    outline-offset: 2px;
+}
+
+.tile--selected {
+    border-color: #0176d3;
+    box-shadow: 0 0 0 3px rgba(1, 118, 211, 0.25);
+}
+
+.preview-area {
+    flex: 2;
+    overflow: hidden;
+    background-color: #f8f8f8;
+}
+
+.preview-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.filename-area {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    padding: 0 6px;
+    background-color: #ffffff;
+    border-top: 1px solid #e0e0e0;
+    overflow: hidden;
+}
+
+.filename-text {
+    font-size: 11px;
+    color: #3e3e3c;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+}
+
+/* Status */
+.status-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 80px;
+}
+
+.status-message {
+    color: #706e6b;
+    font-size: 13px;
+    margin: 0;
+}
+
+/* Upload section */
+.upload-section {
+    border: 2px dashed #d8dde6;
+    border-radius: 6px;
+    padding: 16px;
+    margin-bottom: 12px;
+    background-color: #f8f9fb;
+}
+
+.upload-close {
+    margin-top: 10px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Lightbox */
+.lightbox {
+    position: absolute;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.88);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9000;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+.lightbox-img {
+    max-width: 100%;
+    max-height: calc(100% - 2rem);
+    object-fit: contain;
+    border-radius: 2px;
+    pointer-events: none;
+}
+
+.lightbox-filename {
+    color: #ffffff;
+    font-size: 12px;
+    margin: 6px 0 0;
+    text-align: center;
+    padding: 0 8px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    pointer-events: none;
+}
+
+/* Delete confirmation dialog */
+.confirm-backdrop {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9100;
+}
+
+.confirm-dialog {
+    background-color: #ffffff;
+    border-radius: 8px;
+    padding: 24px;
+    min-width: 320px;
+    max-width: 480px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+}
+
+.confirm-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #181818;
+    margin: 0 0 12px;
+}
+
+.confirm-message {
+    font-size: 14px;
+    color: #3e3e3c;
+    margin: 0 0 20px;
+    line-height: 1.5;
+}
+
+.confirm-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}

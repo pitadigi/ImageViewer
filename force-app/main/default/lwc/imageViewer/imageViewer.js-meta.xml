@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<LightningComponentBundle xmlns="http://soap.sforce.com/2006/04/metadata">
+    <apiVersion>62.0</apiVersion>
+    <masterLabel>Image Viewer</masterLabel>
+    <isExposed>true</isExposed>
+    <targets>
+        <target>lightning__RecordPage</target>
+    </targets>
+    <targetConfigs>
+        <targetConfig targets="lightning__RecordPage">
+            <property name="columns"       type="Integer" default="4"    label="列数"     min="1" max="10" />
+            <property name="hideAddButton"    type="Boolean" default="false" label="追加ボタンを非表示" />
+            <property name="hideDeleteButton" type="Boolean" default="false" label="削除ボタンを非表示" />
+        </targetConfig>
+    </targetConfigs>
+</LightningComponentBundle>
