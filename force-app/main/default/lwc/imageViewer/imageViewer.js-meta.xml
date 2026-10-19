@@ -8,7 +8,7 @@
     </targets>
     <targetConfigs>
         <targetConfig targets="lightning__RecordPage">
-            <property name="columns"          type="Integer" default="4"    label="列数"         min="1" max="10" />
+            <property name="columns"          type="Integer" default="4"    label="表示列数"         min="1" max="10" required="true" />
             <property name="rows"             type="Integer" default="0"    label="表示行数（0=自動）" min="0" />
             <property name="hideAddButton"    type="Boolean" default="false" label="追加ボタンを非表示" />
             <property name="hideDeleteButton" type="Boolean" default="false" label="削除ボタンを非表示" />
