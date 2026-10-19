@@ -2,6 +2,22 @@
     <div class="outer-container" onkeydown={handleKeydown}>
         <lightning-card title="Image Viewer" icon-name="utility:image">
             <div slot="actions">
+                <lightning-button-menu
+                    label={sortFieldLabel}
+                    alternative-text="ソートモード"
+                    variant="border-filled"
+                    onselect={handleSortFieldChange}>
+                    <lightning-menu-item value="title" label="タイトル" checked={isSortByTitle}></lightning-menu-item>
+                    <lightning-menu-item value="createdDate" label="作成日時" checked={isSortByDate}></lightning-menu-item>
+                </lightning-button-menu>
+                <lightning-button-menu
+                    label={sortOrderLabel}
+                    alternative-text="ソート順"
+                    variant="border-filled"
+                    onselect={handleSortOrderChange}>
+                    <lightning-menu-item value="asc" label="昇順" checked={isSortAsc}></lightning-menu-item>
+                    <lightning-menu-item value="desc" label="降順" checked={isSortDesc}></lightning-menu-item>
+                </lightning-button-menu>
                 <template lwc:if={showAddButton}>
                     <lightning-button
                         label="追加"
@@ -73,6 +89,7 @@
                                     </div>
                                     <div class="filename-area">
                                         <span class="filename-text" title={file.title}>{file.title}</span>
+                                        <span class="filedate-text">{file.createdDateFormatted}</span>
                                     </div>
                                 </div>
                             </template>
@@ -92,10 +109,20 @@
                              aria-label="画像の拡大表示"
                              aria-modal="true"
                              tabindex="-1">
+                            <button class="lightbox-close-btn"
+                                    onclick={handleLightboxClose}
+                                    title="タイル表示に戻る"
+                                    aria-label="タイル表示に戻る">
+                                <lightning-icon icon-name="utility:tile_card_list"
+                                               size="small"
+                                               alternative-text="タイル表示に戻る">
+                                </lightning-icon>
+                            </button>
                             <img class="lightbox-img"
                                  src={lightboxFile.fullUrl}
                                  alt={lightboxFile.title} />
                             <p class="lightbox-filename">{lightboxFile.title}</p>
+                            <p class="lightbox-filedate">{lightboxFile.createdDateFormatted}</p>
                         </div>
                     </template>
                 </div>

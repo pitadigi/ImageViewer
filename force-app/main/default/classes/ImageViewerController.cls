@@ -19,13 +19,12 @@ public with sharing class ImageViewerController {
         }
 
         return [
-            SELECT Id, Title, FileExtension, ContentDocumentId
+            SELECT Id, Title, FileExtension, ContentDocumentId, CreatedDate
             FROM ContentVersion
             WHERE ContentDocumentId IN :docIds
               AND IsLatest = true
               AND FileExtension IN ('jpg', 'jpeg', 'png', 'gif')
             WITH USER_MODE
-            ORDER BY Title
         ];
     }
 

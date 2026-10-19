@@ -19,6 +19,8 @@ export default class ImageViewer extends LightningElement {
     showUpload = false;
     showDeleteConfirm = false;
     isRefreshing = false;
+    sortField = 'title';
+    sortOrder = 'asc';
 
     @wire(getImageFiles, { recordId: '$recordId' })
     wiredFiles(result) {
@@ -27,13 +29,7 @@ export default class ImageViewer extends LightningElement {
         this.isRefreshing = false;
         const { error, data } = result;
         if (data) {
-            this.files = data.map(f => ({
-                id: f.Id,
-                contentDocumentId: f.ContentDocumentId,
-                title: f.Title,
-                previewUrl: `/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=${f.Id}&operationContext=CHATTER`,
-                fullUrl: `/sfc/servlet.shepherd/version/download/${f.Id}?operationContext=CHATTER`
-            }));
+            this.files = this._mapData(data);
             if (this.selectedFileId && !this.files.some(f => f.id === this.selectedFileId)) {
                 this.selectedFileId = null;
             }
@@ -42,6 +38,17 @@ export default class ImageViewer extends LightningElement {
             this.error = error;
             this.files = [];
         }
+    }
+
+    _mapData(data) {
+        return data.map(f => ({
+            id: f.Id,
+            contentDocumentId: f.ContentDocumentId,
+            title: f.Title,
+            createdDate: f.CreatedDate,
+            previewUrl: `/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=${f.Id}&operationContext=CHATTER`,
+            fullUrl: `/sfc/servlet.shepherd/version/download/${f.Id}?operationContext=CHATTER`
+        }));
     }
 
     async _doRefresh() {
@@ -53,13 +60,7 @@ export default class ImageViewer extends LightningElement {
             // refreshApex resolves without calling the wire handler when data is unchanged.
             // In that case restore files from the cached result.
             if (this.files.length === 0 && this._wiredResult?.data?.length > 0) {
-                this.files = this._wiredResult.data.map(f => ({
-                    id: f.Id,
-                    contentDocumentId: f.ContentDocumentId,
-                    title: f.Title,
-                    previewUrl: `/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=${f.Id}&operationContext=CHATTER`,
-                    fullUrl: `/sfc/servlet.shepherd/version/download/${f.Id}?operationContext=CHATTER`
-                }));
+                this.files = this._mapData(this._wiredResult.data);
             }
         } catch (err) {
             this.error = err;
@@ -71,8 +72,22 @@ export default class ImageViewer extends LightningElement {
     }
 
     get computedFiles() {
-        return this.files.map(f => ({
+        const fmt = new Intl.DateTimeFormat('ja-JP', {
+            year: 'numeric', month: '2-digit', day: '2-digit',
+            hour: '2-digit', minute: '2-digit'
+        });
+        const sorted = [...this.files].sort((a, b) => {
+            let cmp;
+            if (this.sortField === 'title') {
+                cmp = a.title.localeCompare(b.title, 'ja');
+            } else {
+                cmp = new Date(a.createdDate) - new Date(b.createdDate);
+            }
+            return this.sortOrder === 'asc' ? cmp : -cmp;
+        });
+        return sorted.map(f => ({
             ...f,
+            createdDateFormatted: f.createdDate ? fmt.format(new Date(f.createdDate)) : '',
             tileClass: `tile${f.id === this.selectedFileId ? ' tile--selected' : ''}`
         }));
     }
@@ -113,6 +128,38 @@ export default class ImageViewer extends LightningElement {
         if (!this.selectedFileId) return '';
         const file = this.files.find(f => f.id === this.selectedFileId);
         return file ? `「${file.title}」を削除しますか？` : '';
+    }
+
+    get sortFieldLabel() {
+        return this.sortField === 'title' ? 'タイトル' : '作成日時';
+    }
+
+    get sortOrderLabel() {
+        return this.sortOrder === 'asc' ? '昇順' : '降順';
+    }
+
+    get isSortByTitle() {
+        return this.sortField === 'title';
+    }
+
+    get isSortByDate() {
+        return this.sortField === 'createdDate';
+    }
+
+    get isSortAsc() {
+        return this.sortOrder === 'asc';
+    }
+
+    get isSortDesc() {
+        return this.sortOrder === 'desc';
+    }
+
+    handleSortFieldChange(event) {
+        this.sortField = event.detail.value;
+    }
+
+    handleSortOrderChange(event) {
+        this.sortOrder = event.detail.value;
     }
 
     handleRefresh() {
@@ -170,7 +217,7 @@ export default class ImageViewer extends LightningElement {
 
     handleTileClick(event) {
         const fileId = event.currentTarget.dataset.id;
-        const file = this.files.find(f => f.id === fileId);
+        const file = this.computedFiles.find(f => f.id === fileId);
         if (!file) return;
         this.selectedFileId = fileId;
         this.lightboxFile = file;
