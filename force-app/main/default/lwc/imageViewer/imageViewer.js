@@ -14,6 +14,7 @@ export default class ImageViewer extends LightningElement {
     files = [];
     selectedFileId = null;
     lightboxFile = null;
+    lightboxLoading = false;
     error;
     isLoading = true;
     showUpload = false;
@@ -160,6 +161,10 @@ export default class ImageViewer extends LightningElement {
         return this.sortField === 'createdDate';
     }
 
+    get lightboxImgStyle() {
+        return this.lightboxLoading ? 'visibility: hidden;' : '';
+    }
+
     get isSortAsc() {
         return this.sortOrder === 'asc';
     }
@@ -229,12 +234,29 @@ export default class ImageViewer extends LightningElement {
         }
     }
 
+    _openLightbox(file) {
+        this.lightboxLoading = true;
+        this.lightboxFile = file;
+        const img = new Image();
+        img.onload = () => {
+            if (this.lightboxFile?.id === file.id) {
+                this.lightboxLoading = false;
+            }
+        };
+        img.onerror = () => {
+            if (this.lightboxFile?.id === file.id) {
+                this.lightboxLoading = false;
+            }
+        };
+        img.src = file.fullUrl;
+    }
+
     handleTileClick(event) {
         const fileId = event.currentTarget.dataset.id;
         const file = this.computedFiles.find(f => f.id === fileId);
         if (!file) return;
         this.selectedFileId = fileId;
-        this.lightboxFile = file;
+        this._openLightbox(file);
     }
 
     handleTileKeydown(event) {
@@ -246,6 +268,7 @@ export default class ImageViewer extends LightningElement {
 
     handleLightboxClose() {
         this.lightboxFile = null;
+        this.lightboxLoading = false;
     }
 
     handlePrev(event) {
@@ -254,7 +277,7 @@ export default class ImageViewer extends LightningElement {
         if (idx > 0) {
             const file = this.computedFiles[idx - 1];
             this.selectedFileId = file.id;
-            this.lightboxFile = file;
+            this._openLightbox(file);
         }
     }
 
@@ -264,7 +287,7 @@ export default class ImageViewer extends LightningElement {
         if (idx >= 0 && idx < this.computedFiles.length - 1) {
             const file = this.computedFiles[idx + 1];
             this.selectedFileId = file.id;
-            this.lightboxFile = file;
+            this._openLightbox(file);
         }
     }
 

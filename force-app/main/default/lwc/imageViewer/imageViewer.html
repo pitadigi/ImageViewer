@@ -140,9 +140,15 @@
                                     </lightning-icon>
                                 </button>
                             </template>
+                            <template lwc:if={lightboxLoading}>
+                                <div class="lightbox-spinner">
+                                    <lightning-spinner alternative-text="読み込み中" size="medium" variant="inverse"></lightning-spinner>
+                                </div>
+                            </template>
                             <img class="lightbox-img"
                                  src={lightboxFile.fullUrl}
-                                 alt={lightboxFile.title} />
+                                 alt={lightboxFile.title}
+                                 style={lightboxImgStyle} />
                             <p class="lightbox-filename">{lightboxFile.title}</p>
                             <p class="lightbox-filedate">{lightboxFile.createdDateFormatted}</p>
                         </div>
