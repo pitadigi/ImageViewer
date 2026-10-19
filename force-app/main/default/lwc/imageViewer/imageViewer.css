@@ -17,6 +17,11 @@
     min-height: 4rem;
 }
 
+/* Scroll container (rows limit) */
+.scroll-container {
+    width: 100%;
+}
+
 /* Tile grid */
 .tile-container {
     display: grid;

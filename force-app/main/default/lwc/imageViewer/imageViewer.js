@@ -7,8 +7,13 @@ import getImageFiles from '@salesforce/apex/ImageViewerController.getImageFiles'
 export default class ImageViewer extends LightningElement {
     @api recordId;
     @api columns = 4;
+    @api rows = 0;
     @api hideAddButton = false;
     @api hideDeleteButton = false;
+
+    _tileWidth = 0;
+    _containerWidth = 0;
+    _resizeHandler = null;
 
     _wiredResult;
     files = [];
@@ -97,8 +102,22 @@ export default class ImageViewer extends LightningElement {
         return parseInt(this.columns, 10) || 4;
     }
 
+    get numRows() {
+        return parseInt(this.rows, 10) || 0;
+    }
+
     get containerStyle() {
         return `--columns: ${this.numColumns};`;
+    }
+
+    get scrollContainerStyle() {
+        const r = this.numRows;
+        if (r > 0 && this._tileWidth > 0) {
+            const gap = 4;
+            const height = r * this._tileWidth + gap * (r - 1);
+            return `max-height: ${height}px; overflow-y: auto;`;
+        }
+        return '';
     }
 
     get hasFiles() {
@@ -171,6 +190,32 @@ export default class ImageViewer extends LightningElement {
 
     get isSortDesc() {
         return this.sortOrder === 'desc';
+    }
+
+    connectedCallback() {
+        this._resizeHandler = () => this._updateTileWidth();
+        window.addEventListener('resize', this._resizeHandler);
+    }
+
+    renderedCallback() {
+        this._updateTileWidth();
+    }
+
+    disconnectedCallback() {
+        if (this._resizeHandler) {
+            window.removeEventListener('resize', this._resizeHandler);
+        }
+    }
+
+    _updateTileWidth() {
+        const wrapper = this.template.querySelector('.wrapper');
+        if (!wrapper) return;
+        const w = wrapper.getBoundingClientRect().width;
+        if (w === this._containerWidth) return;
+        this._containerWidth = w;
+        const cols = this.numColumns;
+        const gap = 4;
+        this._tileWidth = (w - gap * (cols - 1)) / cols;
     }
 
     handleSortFieldChange(event) {

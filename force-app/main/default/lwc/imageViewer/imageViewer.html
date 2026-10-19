@@ -74,6 +74,7 @@
                         </div>
                     </template>
                     <template lwc:elseif={hasFiles}>
+                        <div class="scroll-container" style={scrollContainerStyle}>
                         <div class="tile-container">
                             <template for:each={computedFiles} for:item="file">
                                 <div key={file.id}
@@ -93,6 +94,7 @@
                                     </div>
                                 </div>
                             </template>
+                        </div>
                         </div>
                     </template>
                     <template lwc:else>
