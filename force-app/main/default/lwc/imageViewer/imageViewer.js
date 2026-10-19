@@ -112,6 +112,20 @@ export default class ImageViewer extends LightningElement {
         return !this.selectedFileId;
     }
 
+    get _lightboxIndex() {
+        if (!this.lightboxFile) return -1;
+        return this.computedFiles.findIndex(f => f.id === this.lightboxFile.id);
+    }
+
+    get hasPrev() {
+        return this._lightboxIndex > 0;
+    }
+
+    get hasNext() {
+        const idx = this._lightboxIndex;
+        return idx >= 0 && idx < this.computedFiles.length - 1;
+    }
+
     get showAddButton() {
         return !this.hideAddButton;
     }
@@ -232,6 +246,26 @@ export default class ImageViewer extends LightningElement {
 
     handleLightboxClose() {
         this.lightboxFile = null;
+    }
+
+    handlePrev(event) {
+        event.stopPropagation();
+        const idx = this._lightboxIndex;
+        if (idx > 0) {
+            const file = this.computedFiles[idx - 1];
+            this.selectedFileId = file.id;
+            this.lightboxFile = file;
+        }
+    }
+
+    handleNext(event) {
+        event.stopPropagation();
+        const idx = this._lightboxIndex;
+        if (idx >= 0 && idx < this.computedFiles.length - 1) {
+            const file = this.computedFiles[idx + 1];
+            this.selectedFileId = file.id;
+            this.lightboxFile = file;
+        }
     }
 
     handleKeydown(event) {

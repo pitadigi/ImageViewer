@@ -118,6 +118,28 @@
                                                alternative-text="タイル表示に戻る">
                                 </lightning-icon>
                             </button>
+                            <template lwc:if={hasPrev}>
+                                <button class="lightbox-nav lightbox-nav--prev"
+                                        onclick={handlePrev}
+                                        title="前の画像"
+                                        aria-label="前の画像">
+                                    <lightning-icon icon-name="utility:chevronleft"
+                                                   size="small"
+                                                   alternative-text="前の画像">
+                                    </lightning-icon>
+                                </button>
+                            </template>
+                            <template lwc:if={hasNext}>
+                                <button class="lightbox-nav lightbox-nav--next"
+                                        onclick={handleNext}
+                                        title="次の画像"
+                                        aria-label="次の画像">
+                                    <lightning-icon icon-name="utility:chevronright"
+                                                   size="small"
+                                                   alternative-text="次の画像">
+                                    </lightning-icon>
+                                </button>
+                            </template>
                             <img class="lightbox-img"
                                  src={lightboxFile.fullUrl}
                                  alt={lightboxFile.title} />
