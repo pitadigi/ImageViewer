@@ -44,11 +44,30 @@ export default class ImageViewer extends LightningElement {
         }
     }
 
-    _doRefresh() {
+    async _doRefresh() {
         this.files = [];
         this.isLoading = true;
         this.isRefreshing = true;
-        refreshApex(this._wiredResult);
+        try {
+            await refreshApex(this._wiredResult);
+            // refreshApex resolves without calling the wire handler when data is unchanged.
+            // In that case restore files from the cached result.
+            if (this.files.length === 0 && this._wiredResult?.data?.length > 0) {
+                this.files = this._wiredResult.data.map(f => ({
+                    id: f.Id,
+                    contentDocumentId: f.ContentDocumentId,
+                    title: f.Title,
+                    previewUrl: `/sfc/servlet.shepherd/version/renditionDownload?rendition=THUMB720BY480&versionId=${f.Id}&operationContext=CHATTER`,
+                    fullUrl: `/sfc/servlet.shepherd/version/download/${f.Id}?operationContext=CHATTER`
+                }));
+            }
+        } catch (err) {
+            this.error = err;
+            this.files = [];
+        } finally {
+            this.isLoading = false;
+            this.isRefreshing = false;
+        }
     }
 
     get computedFiles() {
